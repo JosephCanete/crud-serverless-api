@@ -1,0 +1,95 @@
+service: sls
+frameworkVersion: "3"
+
+#Environment Variables
+custom:
+  settings:
+    USER_TABLE: userTable
+    USER_COGNITO_POOL_ID: ap-southeast-1_zxe8EwWvX
+    USER_COGNITO_CLIENT_ID: escen3rb67bte7o9a1935sdru
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  environment: ${self:custom.settings}
+  region: ap-southeast-1
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.USER_TABLE}"
+    - Effect: "Allow"
+      Action:
+        - "cognito-idp:AdminInitiateAuth"
+      Resource:
+        - "arn:aws:cognito-idp:ap-southeast-1:277650467882:userpool/ap-southeast-1_q2uCkeEsz"
+
+plugins:
+  - serverless-webpack
+
+package:
+  individually: true
+
+#DynamoDB Config
+resources:
+  Resources:
+    UserTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "userId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "userId"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.settings.USER_TABLE}
+
+#API Gateway Config
+functions:
+  #Users
+  getUser:
+    handler: src/functions/User/GetUser/handler.getUser
+    events:
+      - http:
+          method: get
+          path: /user/{userId}
+  getUsers:
+    handler: src/functions/User/GetUsers/handler.getUsers
+    events:
+      - http:
+          method: get
+          path: /user
+  createUser:
+    handler: src/functions/User/CreateUser/handler.createUser
+    events:
+      - http:
+          method: post
+          path: /user
+  updateUser:
+    handler: src/functions/User/UpdateUser/handler.updateUser
+    events:
+      - http:
+          method: post
+          path: /user/{userId}
+  deleteUser:
+    handler: src/functions/User/DeleteUser/handler.deleteUser
+    events:
+      - http:
+          method: delete
+          path: /user/{userId}
+    #Login
+  loginUser:
+    handler: src/functions/Login/handler.loginUser
+    events:
+      - http:
+          method: post
+          path: /login
