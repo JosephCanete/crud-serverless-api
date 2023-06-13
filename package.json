@@ -12,6 +12,7 @@
     "aws-sdk": "^2.1373.0",
     "axios": "^1.4.0",
     "jsonwebtoken": "^9.0.0",
+    "moment": "^2.29.4",
     "node-uuid": "^1.4.8",
     "serverless-webpack": "^5.9.1",
     "webpack": "^5.74.0"

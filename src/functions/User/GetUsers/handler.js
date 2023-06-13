@@ -10,6 +10,7 @@ const axios = require("axios");
 const jwt = require("jsonwebtoken");
 
 module.exports.getUsers = async (event) => {
+  console.log("event is ", event);
   try {
     const { Items } = await dynamodb
       .scan({

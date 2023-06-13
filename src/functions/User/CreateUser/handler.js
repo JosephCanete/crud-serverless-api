@@ -1,21 +1,21 @@
 "use strict";
 const AWS = require("aws-sdk");
 const dynamodb = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
-const uuid = require("node-uuid");
 const userTable = process.env.USER_TABLE;
 const {
   successResponse,
   errorResponse,
 } = require("../../../utilities/responseBuilder");
 const { checkPayload } = require("../../../utilities/validation");
+const { GenerateDate, GenerateUUID } = require("../../../utilities/helper");
 
 module.exports.createUser = async (event) => {
   const requestBody = JSON.parse(event.body);
   const { username, firstName, middleName, lastName, age, address, role } =
     requestBody;
   const payload = {
-    userId: uuid.v4(),
-    createdAt: new Date().toISOString(),
+    userId: GenerateUUID(),
+    createdAt: GenerateDate(),
     username,
     firstName,
     middleName,
