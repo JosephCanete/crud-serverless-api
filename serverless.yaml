@@ -7,6 +7,8 @@ custom:
     USER_TABLE: userTable
     USER_COGNITO_POOL_ID: ap-southeast-1_zxe8EwWvX
     USER_COGNITO_CLIENT_ID: escen3rb67bte7o9a1935sdru
+    REGION: ap-southeast-1
+    ACCOUNT_ID: 277650467882
 
 provider:
   name: aws
@@ -28,7 +30,7 @@ provider:
       Action:
         - "cognito-idp:AdminInitiateAuth"
       Resource:
-        - "arn:aws:cognito-idp:ap-southeast-1:277650467882:userpool/ap-southeast-1_q2uCkeEsz"
+        - "arn:aws:cognito-idp:ap-southeast-1:277650467882:userpool/${self:custom.settings.USER_COGNITO_POOL_ID}"
 
 plugins:
   - serverless-webpack
@@ -39,6 +41,17 @@ package:
 #DynamoDB Config
 resources:
   Resources:
+    ApiGatewayAuthorizer:
+      Type: AWS::ApiGateway::Authorizer
+      Properties:
+        Name: AuthorizerUsers
+        Type: COGNITO_USER_POOLS
+        IdentitySource: method.request.header.Authorization
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ProviderARNs:
+          - arn:aws:cognito-idp:${self:custom.settings.REGION}:${self:custom.settings.ACCOUNT_ID}:userpool/${self:custom.settings.USER_COGNITO_POOL_ID}
+
     UserTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -68,6 +81,10 @@ functions:
       - http:
           method: get
           path: /user
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: ApiGatewayAuthorizer
   createUser:
     handler: src/functions/User/CreateUser/handler.createUser
     events:
