@@ -1,0 +1,6 @@
+loginUser:
+  handler: src/functions/Login/handler.loginUser
+  events:
+    - http:
+        method: post
+        path: /login

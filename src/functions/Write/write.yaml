@@ -1,0 +1,32 @@
+#CRUD OPERATIONS
+CreatePost:
+  handler: src/functions/Write/CreatePost/handler.CreatePost
+  events:
+    - http:
+        method: post
+        path: /write
+UpdatePost:
+  handler: src/functions/Write/UpdatePost/handler.UpdatePost
+  events:
+    - http:
+        method: patch
+        path: /write/{id}
+DeletePost:
+  handler: src/functions/Write/DeletePost/handler.DeletePost
+  events:
+    - http:
+        method: delete
+        path: /write/{id}
+#FETCH OPERATIONS
+GetPost:
+  handler: src/functions/Write/GetPost/handler.GetPost
+  events:
+    - http:
+        method: get
+        path: /write/{id}
+GetPosts:
+  handler: src/functions/Write/GetPosts/handler.GetPosts
+  events:
+    - http:
+        method: get
+        path: /write

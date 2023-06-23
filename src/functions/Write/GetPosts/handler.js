@@ -1,18 +1,17 @@
 "use strict";
 const AWS = require("aws-sdk");
 const dynamodb = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
-const userTable = process.env.USER_TABLE;
+const DEVOTION = process.env.DEVOTION_TABLE;
 const {
   successResponse,
   errorResponse,
 } = require("../../../utilities/responseBuilder");
 
-module.exports.getUsers = async (event) => {
-  console.log("event is ", event);
+module.exports.GetPosts = async () => {
   try {
     const { Items } = await dynamodb
       .scan({
-        TableName: userTable,
+        TableName: DEVOTION,
       })
       .promise();
     return successResponse(200, Items);

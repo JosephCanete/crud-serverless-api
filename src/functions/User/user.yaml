@@ -1,0 +1,34 @@
+getUser:
+  handler: src/functions/User/GetUser/handler.getUser
+  events:
+    - http:
+        method: get
+        path: /user/{userId}
+getUsers:
+  handler: src/functions/User/GetUsers/handler.getUsers
+  events:
+    - http:
+        method: get
+        path: /user
+        authorizer:
+          type: COGNITO_USER_POOLS
+          authorizerId:
+            Ref: ApiGatewayAuthorizer
+createUser:
+  handler: src/functions/User/CreateUser/handler.createUser
+  events:
+    - http:
+        method: post
+        path: /user
+updateUser:
+  handler: src/functions/User/UpdateUser/handler.updateUser
+  events:
+    - http:
+        method: post
+        path: /user/{userId}
+deleteUser:
+  handler: src/functions/User/DeleteUser/handler.deleteUser
+  events:
+    - http:
+        method: delete
+        path: /user/{userId}

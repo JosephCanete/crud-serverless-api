@@ -4,7 +4,8 @@ frameworkVersion: "3"
 #Environment Variables
 custom:
   settings:
-    USER_TABLE: userTable
+    USER_TABLE: Users
+    DEVOTION_TABLE: Devotions
     USER_COGNITO_POOL_ID: ap-southeast-1_zxe8EwWvX
     USER_COGNITO_CLIENT_ID: escen3rb67bte7o9a1935sdru
     REGION: ap-southeast-1
@@ -26,6 +27,7 @@ provider:
         - dynamodb:DeleteItem
       Resource:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.USER_TABLE}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.settings.DEVOTION_TABLE}"
     - Effect: "Allow"
       Action:
         - "cognito-idp:AdminInitiateAuth"
@@ -38,7 +40,6 @@ plugins:
 package:
   individually: true
 
-#DynamoDB Config
 resources:
   Resources:
     ApiGatewayAuthorizer:
@@ -51,62 +52,39 @@ resources:
           Ref: ApiGatewayRestApi
         ProviderARNs:
           - arn:aws:cognito-idp:${self:custom.settings.REGION}:${self:custom.settings.ACCOUNT_ID}:userpool/${self:custom.settings.USER_COGNITO_POOL_ID}
-
-    UserTable:
+    #DO NOT DELETE DATABASE WILL BE DELETED ONCE PUSH
+    Users:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
-          - AttributeName: "userId"
+          - AttributeName: "id"
             AttributeType: "S"
         KeySchema:
-          - AttributeName: "userId"
+          - AttributeName: "id"
             KeyType: "HASH"
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:custom.settings.USER_TABLE}
-
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+    Devotions:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: "id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.settings.DEVOTION_TABLE}
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
 #API Gateway Config
 functions:
-  #Users
-  getUser:
-    handler: src/functions/User/GetUser/handler.getUser
-    events:
-      - http:
-          method: get
-          path: /user/{userId}
-  getUsers:
-    handler: src/functions/User/GetUsers/handler.getUsers
-    events:
-      - http:
-          method: get
-          path: /user
-          authorizer:
-            type: COGNITO_USER_POOLS
-            authorizerId:
-              Ref: ApiGatewayAuthorizer
-  createUser:
-    handler: src/functions/User/CreateUser/handler.createUser
-    events:
-      - http:
-          method: post
-          path: /user
-  updateUser:
-    handler: src/functions/User/UpdateUser/handler.updateUser
-    events:
-      - http:
-          method: post
-          path: /user/{userId}
-  deleteUser:
-    handler: src/functions/User/DeleteUser/handler.deleteUser
-    events:
-      - http:
-          method: delete
-          path: /user/{userId}
-    #Login
-  loginUser:
-    handler: src/functions/Login/handler.loginUser
-    events:
-      - http:
-          method: post
-          path: /login
+  - ${file(src/functions/User/user.yaml)}
+  - ${file(src/functions/Write/write.yaml)}
+  - ${file(src/functions/Login/login.yaml)}
