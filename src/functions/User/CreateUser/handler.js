@@ -14,7 +14,7 @@ module.exports.createUser = async (event) => {
   const { username, firstName, middleName, lastName, age, address, role } =
     requestBody;
   const payload = {
-    userId: GenerateUUID(),
+    id: GenerateUUID(),
     createdAt: GenerateDate(),
     username,
     firstName,
@@ -45,6 +45,7 @@ module.exports.createUser = async (event) => {
 
     return successResponse(201, payload);
   } catch (error) {
+    console.log("error from catch", { error });
     return errorResponse(error.statusCode, error.message);
   }
 };

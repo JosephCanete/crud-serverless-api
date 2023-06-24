@@ -9,10 +9,10 @@ const {
 const { isExisting } = require("../../../utilities/ddbUtils/isExisting");
 
 module.exports.deleteUser = async (event) => {
-  const userId = event.pathParameters.userId;
-  const isValidUser = await isExisting(userTable, { userId });
+  const { id } = event.pathParameters;
+  const isValidUser = await isExisting(userTable, { id });
   if (typeof boolean && !isValidUser)
-    return errorResponse(404, `User ID of ${userId} not found`);
+    return errorResponse(404, `User ID of ${id} not found`);
   if (isValidUser?.error)
     return errorResponse(isValidUser.statusCode, isValidUser.error);
 
@@ -21,14 +21,14 @@ module.exports.deleteUser = async (event) => {
       .delete({
         TableName: userTable,
         Key: {
-          userId,
+          id,
         },
       })
       .promise();
 
     return successResponse(200, {
       message: `User has successfully deleted.`,
-      userId,
+      id,
     });
   } catch (error) {
     return errorResponse(error.statusCode, error.message);

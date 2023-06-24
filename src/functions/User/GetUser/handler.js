@@ -8,20 +8,20 @@ const {
 } = require("../../../utilities/responseBuilder");
 
 module.exports.getUser = async (event) => {
-  const { userId } = event.pathParameters;
+  const { id } = event.pathParameters;
   try {
     const result = await dynamodb
       .get({
         TableName: userTable,
         Key: {
-          userId,
+          id,
         },
       })
       .promise();
     if (result.Item) {
       return successResponse(200, result.Item);
     } else {
-      return errorResponse(404, `User with ID ${userId} not found`);
+      return errorResponse(404, `User with ID ${id} not found`);
     }
   } catch (error) {
     return errorResponse(error.statusCode, error.message);

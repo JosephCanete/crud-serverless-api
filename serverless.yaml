@@ -32,7 +32,7 @@ provider:
       Action:
         - "cognito-idp:AdminInitiateAuth"
       Resource:
-        - "arn:aws:cognito-idp:ap-southeast-1:277650467882:userpool/${self:custom.settings.USER_COGNITO_POOL_ID}"
+        - "arn:aws:cognito-idp:ap-southeast-1:${self:custom.settings.ACCOUNT_ID}:userpool/${self:custom.settings.USER_COGNITO_POOL_ID}"
 
 plugins:
   - serverless-webpack

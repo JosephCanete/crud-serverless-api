@@ -8,7 +8,7 @@ const {
 } = require("../../../utilities/responseBuilder");
 
 module.exports.updateUser = async (event) => {
-  const { userId } = event.pathParameters;
+  const { id } = event.pathParameters;
   const { username, role, lastName, address, firstName, middleName, age } =
     JSON.parse(event.body);
 
@@ -17,7 +17,7 @@ module.exports.updateUser = async (event) => {
       .update({
         TableName: userTable,
         Key: {
-          userId,
+          id,
         },
         UpdateExpression:
           "set #role = :role, lastName = :lastName, address = :address, firstName = :firstName, middleName = :middleName, age = :age, username = :username",

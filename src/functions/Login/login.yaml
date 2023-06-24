@@ -1,6 +1,12 @@
-loginUser:
-  handler: src/functions/Login/handler.loginUser
+LoginUser:
+  handler: src/functions/Login/Authenticate/handler.LoginUser
   events:
     - http:
         method: post
         path: /login
+ReAuthenticateUser:
+  handler: src/functions/Login/ReAuthenticate/handler.ReAuthenticateUser
+  events:
+    - http:
+        method: post
+        path: /reauth

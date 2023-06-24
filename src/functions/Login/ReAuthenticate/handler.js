@@ -3,28 +3,27 @@ const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 const {
   successResponse,
   errorResponse,
-} = require("../../utilities/responseBuilder");
+} = require("../../../utilities/responseBuilder");
+const USER_COGNITO_CLIENT_ID = process.env.USER_COGNITO_CLIENT_ID;
 
-module.exports.loginUser = async (event) => {
-  const { username, password } = JSON.parse(event.body);
+module.exports.ReAuthenticateUser = async (event) => {
+  const { refreshToken } = JSON.parse(event.body);
 
   const params = {
-    AuthFlow: "ADMIN_NO_SRP_AUTH",
-    ClientId: "2uo0jljm1jm9k7uc99fjrpqbjk",
-    UserPoolId: "ap-southeast-1_q2uCkeEsz",
+    AuthFlow: "REFRESH_TOKEN_AUTH",
+    ClientId: USER_COGNITO_CLIENT_ID,
     AuthParameters: {
-      USERNAME: username,
-      PASSWORD: password,
+      REFRESH_TOKEN: refreshToken,
     },
   };
 
   try {
     const result = await cognitoIdentityServiceProvider
-      .adminInitiateAuth(params)
+      .initiateAuth(params)
       .promise();
 
     return successResponse(200, {
-      message: `Sucessfully login user ${username}.`,
+      message: "Successfully refreshed token.",
       ...result,
     });
   } catch (error) {
